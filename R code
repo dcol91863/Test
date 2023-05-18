@@ -1,0 +1,27 @@
+# Installing required packages
+install.packages(c("quantmod", "corrplot"))
+library(quantmod)
+library(corrplot)
+
+# Define symbols for markets
+symbols <- c("AAPL", "MSFT", "GOOG", "AMZN", "FB")
+
+# Create an environment for market data
+marketData <- new.env()
+
+# Get stock data
+getSymbols(symbols, src = "yahoo", env = marketData, from = "2020-01-01", to = Sys.Date())
+
+# Calculate daily returns
+returns <- do.call(cbind, lapply(symbols, function(x) dailyReturn(marketData[[x]], type = 'log')))
+
+# Handle NAs
+returns <- na.omit(returns)
+
+# Calculate correlation matrix
+corr_matrix <- cor(returns)
+
+# Plot correlation matrix
+corrplot(corr_matrix, method = "color", type = "lower", order = "hclust", 
+         addCoef.col = "black", # Add correlation coefficient on plot
+         tl.col="black", tl.srt=45) # Text label color and rotation
