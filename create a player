@@ -1,0 +1,20 @@
+class Player {
+    String name;
+    String position;
+    ImageIcon playerImage;
+
+    // constructor
+    Player(String name, String position, ImageIcon playerImage) {
+        this.name = name;
+        this.position = position;
+        this.playerImage = playerImage;
+    }
+}
+
+// ...
+
+// When creating a new player
+Player newPlayer = new Player("New player", "New position", new ImageIcon("path/to/new/image.png"));
+
+// Make sure you update the image in your UI as well
+playerImageView.setIcon(newPlayer.playerImage);
