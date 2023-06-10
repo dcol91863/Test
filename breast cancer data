@@ -1,0 +1,82 @@
+import pandas as pd
+import numpy as np
+
+# Load data
+df = pd.read_csv('breastCancerData.csv')
+
+# Filtering based on thresholds
+q3_gte_13 = df[df['radius_mean'] >= 13]
+q4_gte_18 = df[df['texture_mean'] >= 18]
+q5_gte_85 = df[df['perimeter_mean'] >= 85]
+q6_gte_500 = df[df['area_mean'] >= 500]
+
+# Save these datasets to CSV files
+q3_gte_13.to_csv('q3_gte_13.csv', index=False)
+q4_gte_18.to_csv('q4_gte_18.csv', index=False)
+q5_gte_85.to_csv('q5_gte_85.csv', index=False)
+q6_gte_500.to_csv('q6_gte_500.csv', index=False)
+
+# Create separate datasets for M and B for each attribute
+q3_B = df[(df['radius_mean'] >= 13) & (df['diagnosis'] == 'B')]
+q3_M = df[(df['radius_mean'] >= 13) & (df['diagnosis'] == 'M')]
+q4_B = df[(df['texture_mean'] >= 18) & (df['diagnosis'] == 'B')]
+q4_M = df[(df['texture_mean'] >= 18) & (df['diagnosis'] == 'M')]
+q5_B = df[(df['perimeter_mean'] >= 85) & (df['diagnosis'] == 'B')]
+q5_M = df[(df['perimeter_mean'] >= 85) & (df['diagnosis'] == 'M')]
+q6_B = df[(df['area_mean'] >= 500) & (df['diagnosis'] == 'B')]
+q6_M = df[(df['area_mean'] >= 500) & (df['diagnosis'] == 'M')]
+
+# Save these datasets to CSV files
+q3_B.to_csv('q3_B.csv', index=False)
+q3_M.to_csv('q3_M.csv', index=False)
+q4_B.to_csv('q4_B.csv', index=False)
+q4_M.to_csv('q4_M.csv', index=False)
+q5_B.to_csv('q5_B.csv', index=False)
+q5_M.to_csv('q5_M.csv', index=False)
+q6_B.to_csv('q6_B.csv', index=False)
+q6_M.to_csv('q6_M.csv', index=False)
+
+# NewResult: intersection of ids from q3_gte_13, q4_gte_18, q5_gte_85, q6_gte_500
+new_result = pd.concat([q3_gte_13, q4_gte_18, q5_gte_85, q6_gte_500])
+new_result = new_result[new_result.duplicated(subset='id', keep=False)]
+new_result.to_csv('NewResult.csv', index=False)
+
+# SubsetMResult: union of q3_M, q4_M, q5_M, and q6_M
+subset_m_result = pd.concat([q3_M, q4_M, q5_M, q6_M])
+subset_m_result.to_csv('SubsetMResult.csv', index=False)
+
+# Difference_1: SubsetMResult - NewResult
+difference_1 = pd.concat([subset_m_result, new_result])
+difference_1 = difference_1.drop_duplicates(keep=False)
+difference_1.to_csv('Difference_1.csv', index=False)
+
+# OriginalResult: All ids marked M from original dataset
+original_result = df[df['diagnosis'] == 'M']
+original_result.to_csv('OriginalResult.csv', index=False)
+
+# Difference_2: OriginalResult - NewResult
+difference_2 = pd.concat([original_result, new_result])
+difference_2 = difference_2.drop_duplicates(keep=False)
+difference_2.to_csv('Difference_2.csv', index=False)
+
+# Write file
+with open('output.txt', 'w') as f:
+    f.write("Contents of difference 1 (in sorted order):\n")
+    f.write(difference_1.sort_values(by='id').to_string())
+    f.write("\n\nContents of difference 2 (in sorted order):\n")
+    f.write(difference_2.sort_values(by='id').to_string())
+
+# Proportion of observations in Original Result with DIAGNOSIS = M
+proportion_m = len(original_result) / len(df)
+
+# Lengths
+len_subset_m_result = len(subset_m_result)
+len_new_result = len(new_result)
+len_difference_1 = len(difference_1)
+len_difference_2 = len(difference_2)
+
+print(f"Proportion of M in Original Result: {proportion_m}")
+print(f"Length of SubsetMResult: {len_subset_m_result}")
+print(f"Length of NewResult: {len_new_result}")
+print(f"Length of Difference 1: {len_difference_1}")
+print(f"Length of Difference 2: {len_difference_2}")
