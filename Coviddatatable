@@ -1,0 +1,28 @@
+CREATE TABLE Country (
+  CountryName VARCHAR(255),
+  VaccineTypes VARCHAR(255),
+  PRIMARY KEY (CountryName)
+);
+
+CREATE TABLE Vaccination (
+  CountryName VARCHAR(255),
+  TotalVaccinations INT,
+  FirstDoses INT,
+  SecondDoses INT,
+  DailyVaccinationRates FLOAT,
+  PopulationAdjustedCoverage FLOAT,
+  FOREIGN KEY (CountryName) REFERENCES Country(CountryName)
+);
+
+
+
+/*To load data from a CSV file into the table:*/
+
+.load 'path_to_csv_file' Vaccination
+
+
+/*And to run a query, such as getting total vaccinations per country:*/
+
+SELECT CountryName, SUM(TotalVaccinations)
+FROM Vaccination
+GROUP BY CountryName;
