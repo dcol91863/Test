@@ -26,3 +26,58 @@ CREATE TABLE Vaccination (
 SELECT CountryName, SUM(TotalVaccinations)
 FROM Vaccination
 GROUP BY CountryName;
+
+
+
+
+-- C.1 Creating the database
+
+CREATE TABLE Country (
+  id INTEGER PRIMARY KEY,
+  country_name TEXT NOT NULL
+);
+
+CREATE TABLE Vaccination (
+  id INTEGER PRIMARY KEY,
+  total_vaccinations INTEGER,
+  first_dose INTEGER,
+  second_dose INTEGER,
+  daily_vaccinations INTEGER,
+  country_id INTEGER,
+  FOREIGN KEY(country_id) REFERENCES Country(id)
+);
+
+CREATE TABLE US_State (
+  id INTEGER PRIMARY KEY,
+  state_name TEXT NOT NULL,
+  country_id INTEGER,
+  FOREIGN KEY(country_id) REFERENCES Country(id)
+);
+
+CREATE TABLE Age_Group (
+  id INTEGER PRIMARY KEY,
+  age_group TEXT NOT NULL,
+  country_id INTEGER,
+  FOREIGN KEY(country_id) REFERENCES Country(id)
+);
+
+CREATE TABLE Manufacturer (
+  id INTEGER PRIMARY KEY,
+  manufacturer_name TEXT NOT NULL
+);
+
+CREATE TABLE Manufacturer_Country (
+  id INTEGER PRIMARY KEY,
+  manufacturer_id INTEGER,
+  country_id INTEGER,
+  FOREIGN KEY(manufacturer_id) REFERENCES Manufacturer(id),
+  FOREIGN KEY(country_id) REFERENCES Country(id)
+);
+
+CREATE TABLE Observation (
+  id INTEGER PRIMARY KEY,
+  observation_date TEXT NOT NULL,
+  country_id INTEGER,
+  FOREIGN KEY(country_id) REFERENCES Country(id)
+);
+
