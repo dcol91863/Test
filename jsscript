@@ -1,0 +1,30 @@
+// Example data, replace with your actual data
+var requestData = [
+    { id: 'sys_id1', name: 'Request 1' },
+    { id: 'sys_id2', name: 'Request 2' },
+    // ... add more requests as needed
+];
+
+window.onload = function () {
+    var table = document.getElementById('requestTable');
+    
+    requestData.forEach(function(request) {
+        var row = table.insertRow();
+        var cell = row.insertCell();
+        
+        var link = document.createElement('a');
+        link.textContent = request.name;
+        link.href = '#';
+        link.dataset.sysId = request.id;
+        
+        link.onclick = function(e) {
+            e.preventDefault();
+            document.getElementById('formFrame').src = 'your-form-url?sys_id=' + this.dataset.sysId;
+        };
+        
+        cell.appendChild(link);
+    });
+};
+
+
+
