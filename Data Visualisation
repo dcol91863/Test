@@ -14,14 +14,16 @@ duration_values <- input_data[1, grep("^Phase", colnames(input_data))]
 if (length(duration_values) < 2) {
   # Create a single bar chart for the single phase
   phase_name <- paste0("Phase ", 1:length(duration_values))
-  bar_chart <- ggplot(data.frame(phase_name, duration_values), aes(x = phase_name, y = duration_values, fill = phase_name)) +
+  data_single_phase <- data.frame(phase_name = factor(phase_name, levels = phase_name), duration_values = duration_values)
+  
+  bar_chart <- ggplot(data_single_phase, aes(x = phase_name, y = duration_values, fill = phase_name)) +
     geom_bar(stat = "identity") +
     scale_fill_brewer(palette = "Set3") +
     theme_minimal()
-
+  
   # Convert the ggplot chart to plotly
   plotly_chart <- ggplotly(bar_chart)
-
+  
   # Display the plotly chart in RStudio
   plotly::ggplotly(plotly_chart)
 } else {
