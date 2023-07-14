@@ -1,0 +1,29 @@
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+library(plotly)
+library(readxl)
+
+# Read data from Excel file
+input_data <- read_xlsx("D:/Master Schedule Chart/Test.xlsx", sheet = "Test")
+
+# Extract the duration values for each phase
+duration_values <- input_data[1, grep("^Phase", colnames(input_data))]
+
+# Check if the number of phases is less than 2
+if (length(duration_values) < 2) {
+  # Create a single bar chart for the single phase
+  phase_name <- paste0("Phase ", 1:length(duration_values))
+  bar_chart <- ggplot(data.frame(phase_name, duration_values), aes(x = phase_name, y = duration_values, fill = phase_name)) +
+    geom_bar(stat = "identity") +
+    scale_fill_brewer(palette = "Set3") +
+    theme_minimal()
+
+  # Convert the ggplot chart to plotly
+  plotly_chart <- ggplotly(bar_chart)
+
+  # Display the plotly chart in RStudio
+  plotly::ggplotly(plotly_chart)
+} else {
+  stop("Insufficient number of phases to create the chart.")
+}
