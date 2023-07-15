@@ -1,22 +1,22 @@
-# Load required packages
-library(plotly)
+# Load necessary libraries
 library(readxl)
 library(dplyr)
 library(tidyr)
 library(lubridate)
 library(stringr)
-library(htmlwidgets)
+library(plotly)
 
 # Read data from Excel file
 data <- read_xlsx("C:/Users/david/OneDrive/Desktop/Test.xlsx", sheet = "Test")
 
-# Convert from wide to long format
+# Convert from wide to long format and convert phase durations to numeric
 data_long <- data %>%
+  mutate(across(starts_with("phase"), ~replace_na(as.numeric(.), 0))) %>%
   pivot_longer(cols = starts_with("phase"),
                names_to = "Phase",
                values_to = "Duration") %>%
-  mutate(Phase = str_remove(Phase, "phase")) %>%
-  mutate(Phase = as.numeric(Phase))
+  mutate(Phase = str_remove(Phase, "phase"),
+         Phase = as.numeric(Phase))
 
 # Calculate end date of each phase
 data_long <- data_long %>%
@@ -34,6 +34,7 @@ tasks <- data_long %>%
   split(1:nrow(.))
 
 # Create Gantt chart
+colors <- colorRampPalette(c("red", "blue"))(length(tasks))
 fig <- plot_ly()
 for(i in seq_along(tasks)) {
   t <- tasks[[i]]
@@ -41,17 +42,19 @@ for(i in seq_along(tasks)) {
                    y = ~t$Task,
                    x = ~t$Start,
                    xend = ~t$End,
-                   type = "bar",
+                   type = "scatter",
+                   mode = "lines",
+                   line = list(width = 20),
                    hoverinfo = "text",
                    text = ~paste("Start:", t$Start, "<br>End:", t$End),
                    showlegend = FALSE,
-                   marker = list(color = colorRampPalette(c("red", "blue"))(length(tasks))[i]))
+                   marker = list(color = colors[i]))
 }
 
 # Add layout
 fig <- layout(fig, title = "Gantt Chart of Project Phases",
               yaxis = list(title = "Project Phase", showticklabels = TRUE),
-              xaxis = list(title = "Month", type = 'date'))
+              xaxis = list(title = 'Month', type = 'date'))
 
 # Print Gantt chart
 print(fig)
