@@ -1,0 +1,68 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+
+# Load the Excel file
+scatter_data = pd.read_excel("/mnt/data/Scatter_Plot_Data.xlsx")
+
+# Create a color map for the categories
+cmap = plt.get_cmap('tab10')
+colors = {category: cmap(i) for i, category in enumerate(scatter_data['Category'].unique())}
+
+# Create a legend for the categories
+legend_elements = [Patch(facecolor=color, label=category) for category, color in colors.items()]
+
+# Define a function to add jitter
+def add_jitter(values, amount=0.05):
+    return values + np.random.uniform(-amount, amount, size=len(values))
+
+# Increase the amount of jitter
+jittered_likelihood = add_jitter(scatter_data['Likelihood'], amount=0.1)
+jittered_impact = add_jitter(scatter_data['Impact'], amount=0.1)
+
+# Create a figure and an axes
+fig, ax = plt.subplots(figsize=(10, 10))
+
+# Scatter plot with points color-coded by category and labeled with the risk ID
+scatter = ax.scatter(jittered_likelihood, jittered_impact, c=scatter_data['Category'].map(colors), alpha=0.6, marker='o')
+
+# Add labels to the points
+for i, txt in enumerate(scatter_data['Risk ID']):
+    ax.annotate(txt, (jittered_likelihood.iat[i], jittered_impact.iat[i]))
+
+# Create a legend for the categories
+ax.legend(handles=legend_elements, loc='upper right')
+
+# Set the title and labels
+ax.set_title('Risk Scatter Plot')
+ax.set_xlabel('Likelihood')
+ax.set_ylabel('Impact')
+
+# Show the plot
+plt.show()
+
+
+
+#equivalent R code below
+
+# Load necessary libraries
+library(readxl)
+library(ggplot2)
+library(dplyr)
+
+# Load the Excel file
+scatter_data <- read_excel("/mnt/data/Scatter_Plot_Data.xlsx")
+
+# Add jitter
+scatter_data <- scatter_data %>%
+  mutate(jittered_likelihood = Likelihood + runif(n(), min = -0.1, max = 0.1),
+         jittered_impact = Impact + runif(n(), min = -0.1, max = 0.1))
+
+# Scatter plot with points color-coded by category and labeled with the risk ID
+ggplot(scatter_data, aes(x = jittered_likelihood, y = jittered_impact, color = Category, label = Risk ID)) +
+  geom_point() +
+  geom_text(aes(label = Risk ID), vjust = -1, hjust = -0.5) +
+  labs(x = "Likelihood", y = "Impact", title = "Risk Scatter Plot") +
+  theme_minimal() +
+  theme(legend.position = "right")
