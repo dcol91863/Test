@@ -1,0 +1,30 @@
+import React, { useState } from 'react';
+import { useAuth0 } from 'auth0-react';
+
+const AccountLinking = () => {
+  const { user } = useAuth0();
+  const [isLinking, setIsLinking] = useState(false);
+
+  const handleLinkAccount = async () => {
+    setIsLinking(true);
+
+    const { provider } = await useAuth0.linkAccount();
+
+    // Redirect the user to the provider's login page
+    window.location.href = provider.authorizationUrl;
+  };
+
+  return (
+    <div>
+      <h1>Account Linking</h1>
+
+      {isLinking ? (
+        <p>Linking your account...</p>
+      ) : (
+        <button onClick={handleLinkAccount}>Link Account</button>
+      )}
+    </div>
+  );
+};
+
+export default AccountLinking;
